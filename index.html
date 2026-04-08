@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAWA Online | Word Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --main-blue: #092854;
+            --wawa-gold: #d4af37;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        body {
+            background-color: var(--main-blue);
+            color: #ffffff;
+            font-family: 'Comic Neue', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* מונע גלילה מיותרת בניידים */
+        }
+
+        /* סרגל עליון עם סטטוס חיבור */
+        #header {
+            width: 100%;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: red; /* אדום כשלא מחובר */
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .connected { background-color: #2ecc71 !important; }
+
+        h1 {
+            color: var(--wawa-gold);
+            margin: 0;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* לוח המשחק המרכזי */
+        #game-board {
+            flex-grow: 1;
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px;
+            border: 3px solid var(--wawa-gold);
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        /* אזור הקלפים של השחקן (למטה) */
+        #player-hand {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 3px solid var(--wawa-gold);
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            min-height: 180px;
+            perspective: 1000px; /* אפקט תלת מימד קטן */
+        }
+
+        /* עיצוב הקלף */
+        .card {
+            width: 110px;
+            height: 160px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            object-fit: contain;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-25px) rotate(2deg) scale(1.1);
+            border-color: var(--wawa-gold);
+            z-index: 10;
+        }
+
+        /* אזור הודעות משחק */
+        #game-messages {
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border: 1px solid var(--wawa-gold);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>WAWA ONLINE</h1>
+        <div>
+            <span id="status-text">מתחבר...</span>
+            <div id="status-dot"></div>
+        </div>
+    </div>
+
+    <div id="game-board">
+        <div id="game-messages">ברוכים הבאים ל-WAWA! ממתינים לתחילת המשחק...</div>
+        <p style="opacity: 0.5;">הקלפים ששוחקו יופיעו כאן</p>
+    </div>
+
+    <div id="player-hand">
+        </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        const socket = io();
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const playerHand = document.getElementById('player-hand');
+
+        // זיהוי חיבור מוצלח
+        socket.on('connect', () => {
+            statusDot.classList.add('connected');
+            statusText.innerText = 'מחובר למשחק';
+            console.log('Connected with ID:', socket.id);
+        });
+
+        // זיהוי ניתוק
+        socket.on('disconnect', () => {
+            statusDot.classList.remove('connected');
+            statusText.innerText = 'מנותק';
+        });
+
+        // פונקציה להוספת קלף ליד (תופעל על ידי השרת מחר)
+        function drawCard(imageName) {
+            const img = document.createElement('img');
+            // הנתיב מצביע לתיקיית ה-cards שהעלית ל-GitHub
+            img.src = `cards/${imageName}`; 
+            img.className = 'card';
+            img.alt = imageName;
+            
+            // לחיצה על קלף כדי "לשחק" אותו
+            img.onclick = () => {
+                playCard(imageName, img);
+            };
+
+            playerHand.appendChild(img);
+        }
+
+        function playCard(name, element) {
+            console.log('Playing card:', name);
+            // כאן נוסיף מחר את השליחה לשרת
+            element.style.opacity = "0.5";
+            element.style.pointerEvents = "none";
+        }
+
+        // בדיקה זמנית: ננסה לטעון קלף אחד אם הוא קיים בתיקייה
+        // drawCard('pink_snake.png');
+    </script>
+</body>
+</html>
