@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAWA Online</title>
+    <title>WAWA Online | Words Activity Double Fun!</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-blue: #092854;
-            --wawa-gold: #d4af37;
+            --bg-blue: #092854; /* הכחול העמוק שלך */
+            --wawa-gold: #d4af37; /* צהוב זהב */
             --pure-white: #ffffff;
             --menu-black: #121212;
         }
@@ -26,12 +26,14 @@
             overflow: hidden;
         }
 
+        /* מסך פתיחה */
         #start-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             text-align: center;
+            animation: fadeIn 0.8s ease-in;
         }
 
         .logo-container {
@@ -39,23 +41,24 @@
         }
 
         .main-logo {
-            width: 320px; /* הגדלתי את הלוגו */
+            width: 320px; /* לוגו מוגדל */
             max-width: 85vw;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
 
-        /* תיקון סלוגן LTR וצביעת WA */
+        /* תיקון סלוגן LTR וצביעת האותיות הראשונות בלבד */
         .slogan {
             direction: ltr;
             display: inline-block;
             font-size: 1.5rem;
             color: var(--pure-white);
             margin-top: 10px;
+            letter-spacing: 1px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        .wa-highlight {
-            color: var(--wawa-gold);
+        .first-letter-highlight {
+            color: var(--wawa-gold); /* רק האות הראשונה בזהב */
             font-weight: bold;
         }
 
@@ -72,10 +75,10 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Comic Neue', sans-serif;
-            box-sizing: border-box; /* מבטיח שהמסגרת לא תגדיל את הכפתור */
+            box-sizing: border-box; /* חשוב למניעת החרבת העיצוב */
         }
 
-        /* קו מתאר צהוב לאיך משחקים */
+        /* קו מתאר צהוב לכפתור ההוראות */
         .btn-rules { 
             background-color: var(--menu-black); 
             color: var(--wawa-gold);
@@ -85,12 +88,12 @@
         .btn-online { background-color: var(--wawa-gold); color: var(--menu-black); }
         .btn-ai { background-color: var(--pure-white); color: var(--menu-black); }
 
-        .menu-btn:hover { transform: translateY(-3px); }
+        .menu-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        /* התאמה לניידים */
+        /* התאמה לניידים - מניעת שבירת טקסט */
         @media (max-width: 480px) {
             .menu-btn {
-                font-size: 1.2rem; /* הקטנת טקסט כדי שלא יישבר */
+                font-size: 1.2rem; /* טקסט קטן יותר בנייד */
                 padding: 14px;
             }
             .main-logo {
@@ -124,31 +127,43 @@
             width: 550px;
             max-width: 85%;
             text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
 
-        .modal-content p { text-align: right; font-size: 1.2rem; }
+        .modal-content h2 { color: var(--bg-blue); font-size: 2rem; margin-top: 0; }
+        .modal-content p { font-size: 1.2rem; line-height: 1.6; text-align: right; margin-bottom: 20px; }
 
         .action-btn {
             background-color: var(--bg-blue);
             color: var(--wawa-gold);
-            padding: 12px 40px;
+            padding: 12px 45px;
+            font-size: 1.3rem;
             border: none;
             border-radius: 50px;
-            font-size: 1.3rem;
             cursor: pointer;
+            font-family: 'Comic Neue', sans-serif;
             font-weight: bold;
         }
 
         select {
-            padding: 10px;
+            padding: 10px 20px;
             font-size: 1.2rem;
-            margin: 15px 0;
-            width: 200px;
-            border: 2px solid var(--bg-blue);
             border-radius: 10px;
+            border: 2px solid var(--bg-blue);
+            margin: 15px 0;
+            width: 220px;
+            text-align: center;
+            cursor: pointer;
         }
 
-        #game-container { display: none; width: 100%; height: 100%; }
+        /* לוח משחק (נסתר בהתחלה) */
+        #game-container {
+            display: none;
+            width: 100%; height: 100%;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -160,7 +175,9 @@
             <img src="logo-wawa.png" alt="WAWA Logo" class="main-logo">
             <br>
             <div class="slogan">
-                <span class="wa-highlight">Wa</span>rds <span class="wa-highlight">Ac</span>tivity Double Fun!
+                <span class="first-letter-highlight">W</span>ords 
+                <span class="first-letter-highlight">A</span>ctivity 
+                Double Fun!
             </div>
         </div>
         
@@ -173,7 +190,7 @@
         <h2>הוראות המשחק</h2>
         <p>• כל שחקן מקבל 7 קלפים. המטרה: להיות הראשון בלי קלפים!</p>
         <p>• ניתן להניח קלף שמתאים ב<b>צבע</b> או ב<b>אות הראשונה</b> לקלף שעל השולחן.</p>
-        <p>• קלפי הכוח המוזהבים יעזרו לכם לשבש את היריבים.</p>
+        <p>• קלפי הכוח המוזהבים (Mixer, Bridge ועוד) יעזרו לכם לשבש את היריבים.</p>
         <button class="action-btn" onclick="closeModals()">הבנתי!</button>
     </div>
 
@@ -189,7 +206,8 @@
         <button class="action-btn" onclick="startGame('ai')">התחל משחק</button>
     </div>
 
-    <div id="game-container"></div>
+    <div id="game-container">
+        </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -209,6 +227,7 @@
             closeModals();
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
+            
             if (mode === 'ai') {
                 const count = document.getElementById('ai-player-count').value;
                 socket.emit('join-game', { mode: 'ai', count: count });
