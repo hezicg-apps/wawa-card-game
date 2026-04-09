@@ -10,54 +10,72 @@
         :root {
             --main-blue: #092854;
             --wawa-gold: #d4af37;
-            --card-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            --wawa-black: #1a1a1a;
+            --wawa-white: #ffffff;
         }
 
         body {
             background-color: var(--main-blue);
-            color: #ffffff;
+            color: var(--wawa-white);
             font-family: 'Comic Neue', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* מסך פתיחה - בסגנון Super Tic Tac Toe */
+        #start-screen {
+            background-color: #15803d; /* ירוק בסגנון המשחק הקודם שלך */
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 100;
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden; /* מונע גלילה מיותרת בניידים */
+            justify-content: center;
+            text-align: center;
         }
 
-        /* סרגל עליון עם סטטוס חיבור */
-        #header {
-            width: 100%;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        #status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: red; /* אדום כשלא מחובר */
-            display: inline-block;
-            margin-left: 5px;
-        }
-
-        .connected { background-color: #2ecc71 !important; }
-
-        h1 {
+        .menu-title {
+            font-size: 6rem;
             color: var(--wawa-gold);
-            margin: 0;
-            font-size: 24px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            text-shadow: 4px 4px 0px #000;
         }
 
-        /* לוח המשחק המרכזי */
+        .menu-button {
+            width: 320px;
+            padding: 15px;
+            margin: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            border: 4px solid #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-family: 'Comic Neue', sans-serif;
+        }
+
+        .btn-black { background-color: var(--wawa-black); color: var(--wawa-gold); }
+        .btn-gold { background-color: var(--wawa-gold); color: #000; }
+        .btn-white { background-color: #fff; color: #000; }
+
+        .menu-button:hover { transform: scale(1.05); }
+
+        /* לוח המשחק (מוסתר בהתחלה) */
+        #game-container {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
         #game-board {
             flex-grow: 1;
-            width: 90%;
-            max-width: 1000px;
             margin: 20px;
             border: 3px solid var(--wawa-gold);
             border-radius: 25px;
@@ -67,117 +85,108 @@
             align-items: center;
             background: rgba(255, 255, 255, 0.03);
             box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
-            position: relative;
         }
 
-        /* אזור הקלפים של השחקן (למטה) */
         #player-hand {
-            width: 100%;
             background: rgba(0, 0, 0, 0.4);
             border-top: 3px solid var(--wawa-gold);
-            padding: 20px 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             gap: 15px;
             min-height: 180px;
-            perspective: 1000px; /* אפקט תלת מימד קטן */
         }
 
-        /* עיצוב הקלף */
         .card {
-            width: 110px;
-            height: 160px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
+            width: 100px;
+            height: 140px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             cursor: pointer;
-            transition: all 0.3s ease;
-            object-fit: contain;
-            border: 2px solid transparent;
+            transition: 0.2s;
         }
 
-        .card:hover {
-            transform: translateY(-25px) rotate(2deg) scale(1.1);
-            border-color: var(--wawa-gold);
-            z-index: 10;
-        }
+        .card:hover { transform: translateY(-20px); }
 
-        /* אזור הודעות משחק */
-        #game-messages {
-            background: rgba(0,0,0,0.5);
-            padding: 10px 20px;
-            border-radius: 50px;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            border: 1px solid var(--wawa-gold);
+        /* חלונית הוראות */
+        #instructions-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 20px;
+            border: 5px solid var(--wawa-gold);
+            z-index: 200;
+            max-width: 80%;
+            text-align: right;
         }
-
     </style>
 </head>
 <body>
 
-    <div id="header">
-        <h1>WAWA ONLINE</h1>
-        <div>
-            <span id="status-text">מתחבר...</span>
-            <div id="status-dot"></div>
-        </div>
+    <div id="start-screen">
+        <h1 class="menu-title">WAWA</h1>
+        
+        <button class="menu-button btn-black" onclick="showInstructions()">איך משחקים?</button>
+        <button class="menu-button btn-gold" onclick="startOnline()">שחקן נגד שחקן (Online)</button>
+        <button class="menu-button btn-white" onclick="startAI(1)">שחקן נגד מחשב</button>
+        <button class="menu-button btn-white" onclick="startAI(3)">שחקן נגד 3 מחשבים</button>
     </div>
 
-    <div id="game-board">
-        <div id="game-messages">ברוכים הבאים ל-WAWA! ממתינים לתחילת המשחק...</div>
-        <p style="opacity: 0.5;">הקלפים ששוחקו יופיעו כאן</p>
+    <div id="game-container">
+        <div id="game-board">
+            <div id="game-messages">ממתין לתור שלך...</div>
+        </div>
+        <div id="player-hand"></div>
     </div>
 
-    <div id="player-hand">
-        </div>
+    <div id="instructions-modal">
+        <h2>איך משחקים ב-WAWA?</h2>
+        <p>1. כל שחקן מקבל 7 קלפים.</p>
+        <p>2. עליך להניח קלף שמתאים בצבע או באות הראשונה לקלף שעל השולחן.</p>
+        <p>3. קלפי זהב הם קלפי כוח (ערבוב, גניבה, הגנה).</p>
+        <button onclick="closeInstructions()">הבנתי!</button>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    
     <script>
         const socket = io();
-        const statusDot = document.getElementById('status-dot');
-        const statusText = document.getElementById('status-text');
-        const playerHand = document.getElementById('player-hand');
 
-        // זיהוי חיבור מוצלח
-        socket.on('connect', () => {
-            statusDot.classList.add('connected');
-            statusText.innerText = 'מחובר למשחק';
-            console.log('Connected with ID:', socket.id);
-        });
-
-        // זיהוי ניתוק
-        socket.on('disconnect', () => {
-            statusDot.classList.remove('connected');
-            statusText.innerText = 'מנותק';
-        });
-
-        // פונקציה להוספת קלף ליד (תופעל על ידי השרת מחר)
-        function drawCard(imageName) {
-            const img = document.createElement('img');
-            // הנתיב מצביע לתיקיית ה-cards שהעלית ל-GitHub
-            img.src = `cards/${imageName}`; 
-            img.className = 'card';
-            img.alt = imageName;
-            
-            // לחיצה על קלף כדי "לשחק" אותו
-            img.onclick = () => {
-                playCard(imageName, img);
-            };
-
-            playerHand.appendChild(img);
+        function showInstructions() {
+            document.getElementById('instructions-modal').style.display = 'block';
         }
 
-        function playCard(name, element) {
-            console.log('Playing card:', name);
-            // כאן נוסיף מחר את השליחה לשרת
-            element.style.opacity = "0.5";
-            element.style.pointerEvents = "none";
+        function closeInstructions() {
+            document.getElementById('instructions-modal').style.display = 'none';
         }
 
-        // בדיקה זמנית: ננסה לטעון קלף אחד אם הוא קיים בתיקייה
-        // drawCard('pink_snake.png');
+        function startOnline() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            socket.emit('join-game', { mode: 'online' });
+        }
+
+        function startAI(opponentsCount) {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            socket.emit('join-game', { mode: 'ai', count: opponentsCount });
+        }
+
+        // האזנה לקבלת קלפים מהשרת
+        socket.on('deal-cards', (cards) => {
+            const hand = document.getElementById('player-hand');
+            hand.innerHTML = ''; // ניקוי יד קודמת
+            cards.forEach(card => {
+                const img = document.createElement('img');
+                img.src = card; // הנתיב מהשרת
+                img.className = 'card';
+                hand.appendChild(img);
+            });
+        });
     </script>
 </body>
 </html>
