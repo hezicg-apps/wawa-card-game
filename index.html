@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAWA Online | Word Academy</title>
+    <title>WAWA Online | Words Activity Double Fun!</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --main-blue: #092854;
+            --bg-blue: #092854;
             --wawa-gold: #d4af37;
-            --wawa-black: #1a1a1a;
-            --wawa-white: #ffffff;
+            --pure-white: #ffffff;
+            --menu-black: #121212;
         }
 
         body {
-            background-color: var(--main-blue);
-            color: var(--wawa-white);
+            background-color: var(--bg-blue);
+            color: var(--pure-white);
             font-family: 'Comic Neue', sans-serif;
             margin: 0;
             display: flex;
@@ -26,167 +26,187 @@
             overflow: hidden;
         }
 
-        /* מסך פתיחה - בסגנון Super Tic Tac Toe */
+        /* מסך פתיחה */
         #start-screen {
-            background-color: #15803d; /* ירוק בסגנון המשחק הקודם שלך */
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            z-index: 100;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            width: 100%;
             text-align: center;
+            animation: fadeIn 0.8s ease-in;
         }
 
-        .menu-title {
-            font-size: 6rem;
+        .logo-container {
+            margin-bottom: 35px;
+        }
+
+        .main-logo {
+            width: 280px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+        }
+
+        .slogan {
+            font-size: 1.4rem;
+            color: var(--pure-white);
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .slogan .highlight {
             color: var(--wawa-gold);
-            margin-bottom: 30px;
-            text-shadow: 4px 4px 0px #000;
+            font-weight: bold;
         }
 
-        .menu-button {
+        /* כפתורי תפריט */
+        .menu-btn {
             width: 320px;
-            padding: 15px;
+            padding: 18px;
             margin: 10px;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: bold;
-            border-radius: 50px;
-            border: 4px solid #000;
+            border-radius: 60px;
+            border: 4px solid var(--menu-black);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
             font-family: 'Comic Neue', sans-serif;
         }
 
-        .btn-black { background-color: var(--wawa-black); color: var(--wawa-gold); }
-        .btn-gold { background-color: var(--wawa-gold); color: #000; }
-        .btn-white { background-color: #fff; color: #000; }
+        .btn-rules { background-color: var(--menu-black); color: var(--wawa-gold); }
+        .btn-online { background-color: var(--wawa-gold); color: var(--menu-black); }
+        .btn-ai { background-color: var(--pure-white); color: var(--menu-black); }
 
-        .menu-button:hover { transform: scale(1.05); }
+        .menu-btn:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
 
-        /* לוח המשחק (מוסתר בהתחלה) */
-        #game-container {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-        }
-
-        #game-board {
-            flex-grow: 1;
-            margin: 20px;
-            border: 3px solid var(--wawa-gold);
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.03);
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
-        }
-
-        #player-hand {
-            background: rgba(0, 0, 0, 0.4);
-            border-top: 3px solid var(--wawa-gold);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            min-height: 180px;
-        }
-
-        .card {
-            width: 100px;
-            height: 140px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .card:hover { transform: translateY(-20px); }
-
-        /* חלונית הוראות */
-        #instructions-modal {
+        /* מודאלים */
+        #modal-overlay {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            color: black;
-            padding: 30px;
-            border-radius: 20px;
-            border: 5px solid var(--wawa-gold);
-            z-index: 200;
-            max-width: 80%;
-            text-align: right;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
         }
+
+        .modal-content {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--pure-white);
+            color: var(--menu-black);
+            padding: 40px;
+            border-radius: 30px;
+            border: 8px solid var(--wawa-gold);
+            z-index: 110;
+            width: 600px;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.7);
+        }
+
+        .modal-content h2 { color: var(--bg-blue); font-size: 2.2rem; margin-top: 0; }
+        .modal-content p { font-size: 1.3rem; line-height: 1.6; text-align: right; margin-bottom: 25px; }
+
+        .action-btn {
+            background-color: var(--bg-blue);
+            color: var(--wawa-gold);
+            padding: 15px 50px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: bold;
+        }
+
+        select {
+            padding: 12px 20px;
+            font-size: 1.4rem;
+            border-radius: 15px;
+            border: 3px solid var(--bg-blue);
+            margin: 20px 0;
+            cursor: pointer;
+            width: 250px;
+            text-align: center;
+        }
+
+        /* לוח משחק (נסתר בהתחלה) */
+        #game-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
+    <div id="modal-overlay"></div>
+
     <div id="start-screen">
-        <h1 class="menu-title">WAWA</h1>
+        <div class="logo-container">
+            <img src="logo-wawa.png" alt="WAWA Logo" class="main-logo">
+            <div class="slogan">
+                <span class="highlight">Words Activity</span> Double Fun!
+            </div>
+        </div>
         
-        <button class="menu-button btn-black" onclick="showInstructions()">איך משחקים?</button>
-        <button class="menu-button btn-gold" onclick="startOnline()">שחקן נגד שחקן (Online)</button>
-        <button class="menu-button btn-white" onclick="startAI(1)">שחקן נגד מחשב</button>
-        <button class="menu-button btn-white" onclick="startAI(3)">שחקן נגד 3 מחשבים</button>
+        <button class="menu-btn btn-rules" onclick="openModal('rules-modal')">איך משחקים?</button>
+        <button class="menu-btn btn-online" onclick="startGame('online')">שחקן נגד שחקן (Online)</button>
+        <button class="menu-btn btn-ai" onclick="openModal('ai-modal')">שחקן נגד מחשב</button>
+    </div>
+
+    <div id="rules-modal" class="modal-content">
+        <h2>הוראות המשחק</h2>
+        <p>• כל שחקן מקבל 7 קלפים. המטרה: להיות הראשון בלי קלפים!</p>
+        <p>• ניתן להניח קלף שמתאים ב<b>צבע</b> או ב<b>אות הראשונה</b> לקלף שעל השולחן.</p>
+        <p>• קלפי הכוח המוזהבים יעזרו לכם לשבש את היריבים.</p>
+        <button class="action-btn" onclick="closeModals()">הבנתי!</button>
+    </div>
+
+    <div id="ai-modal" class="modal-content">
+        <h2>משחק נגד המחשב</h2>
+        <p style="text-align: center;">כמה שחקני מחשב יצטרפו אליך?</p>
+        <select id="ai-player-count">
+            <option value="1">שחקן מחשב אחד</option>
+            <option value="2">2 שחקני מחשב</option>
+            <option value="3">3 שחקני מחשב</option>
+        </select>
+        <br>
+        <button class="action-btn" onclick="startGame('ai')">התחל משחק</button>
     </div>
 
     <div id="game-container">
-        <div id="game-board">
-            <div id="game-messages">ממתין לתור שלך...</div>
         </div>
-        <div id="player-hand"></div>
-    </div>
-
-    <div id="instructions-modal">
-        <h2>איך משחקים ב-WAWA?</h2>
-        <p>1. כל שחקן מקבל 7 קלפים.</p>
-        <p>2. עליך להניח קלף שמתאים בצבע או באות הראשונה לקלף שעל השולחן.</p>
-        <p>3. קלפי זהב הם קלפי כוח (ערבוב, גניבה, הגנה).</p>
-        <button onclick="closeInstructions()">הבנתי!</button>
-    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
 
-        function showInstructions() {
-            document.getElementById('instructions-modal').style.display = 'block';
+        function openModal(id) {
+            document.getElementById('modal-overlay').style.display = 'block';
+            document.getElementById(id).style.display = 'block';
         }
 
-        function closeInstructions() {
-            document.getElementById('instructions-modal').style.display = 'none';
+        function closeModals() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
         }
 
-        function startOnline() {
+        function startGame(mode) {
+            closeModals();
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
-            socket.emit('join-game', { mode: 'online' });
+            
+            if (mode === 'ai') {
+                const count = document.getElementById('ai-player-count').value;
+                socket.emit('join-game', { mode: 'ai', count: count });
+            } else {
+                socket.emit('join-game', { mode: 'online' });
+            }
         }
-
-        function startAI(opponentsCount) {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-            socket.emit('join-game', { mode: 'ai', count: opponentsCount });
-        }
-
-        // האזנה לקבלת קלפים מהשרת
-        socket.on('deal-cards', (cards) => {
-            const hand = document.getElementById('player-hand');
-            hand.innerHTML = ''; // ניקוי יד קודמת
-            cards.forEach(card => {
-                const img = document.createElement('img');
-                img.src = card; // הנתיב מהשרת
-                img.className = 'card';
-                hand.appendChild(img);
-            });
-        });
     </script>
 </body>
 </html>
