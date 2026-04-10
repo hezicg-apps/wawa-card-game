@@ -2,37 +2,62 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>WAWA Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAWA - Double Fun!</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="setup-screen" class="overlay">
-        <div class="logo-area">
-            <img src="logo-wawa.png" class="main-logo-img">
-            <h1 class="logo-text">Words Activity Double Fun!</h1>
+        <div class="logo-container">
+            <img src="logo-wawa.png" class="wawa-logo-img" alt="WAWA Logo">
+            <h1 class="wawa-tagline">Words Activity Double Fun!</h1>
         </div>
         
         <div class="menu-container">
-            <button onclick="showRules()">איך משחקים?</button>
-            <button onclick="setMode('cpu')">שחקן נגד מחשב</button>
-            <button onclick="setMode('pvp')">שחקן נגד שחקן</button>
+            <button class="menu-btn" onclick="showRules()">איך משחקים?</button>
+            <button class="menu-btn" onclick="setMode('cpu')">שחקן נגד מחשב</button>
+            <button class="menu-btn" onclick="setMode('pvp')">שחקן נגד שחקן</button>
         </div>
 
         <button class="lock-btn" onclick="openAdmin()">🔒</button>
-        
-        <div id="names-input" style="display:none;"></div>
+    </div>
+
+    <div id="turn-modal" class="overlay" style="display:none;">
+        <div class="turn-box">
+            <h1 id="next-player-name">תור של שחקן</h1>
+            <p>העבר את המכשיר לשחקן הבא</p>
+            <button class="ready-btn" onclick="revealHand()">אני מוכן!</button>
+        </div>
     </div>
 
     <div id="game-board" style="display:none;">
-        <div class="center-area">
-            <div id="discard-pile"></div>
+        <div class="top-bar">
+            <span id="player-label">שחקן נוכחי</span>
+        </div>
+
+        <div class="game-center">
+            <div id="discard-pile" class="pile-container"></div>
             <div class="deck-pile" onclick="drawCard()">
-                <img src="card_back.jpg" class="card-image">
+                <img src="card_back.jpg" class="card-back-img">
             </div>
         </div>
-        <div id="player-hand" class="card-grid"></div>
+
+        <div class="player-hand-area">
+            <div id="player-hand" class="card-grid"></div>
+        </div>
+    </div>
+
+    <div id="question-overlay" class="overlay" style="display:none;">
+        <div class="question-card">
+            <div id="question-img-container"></div>
+            <div class="audio-row">
+                <button class="audio-btn" onclick="speakCurrentWord()">🔊</button>
+                <span id="target-word-en"></span>
+            </div>
+            <div id="answers-grid" class="answers-grid"></div>
+        </div>
     </div>
 
     <script src="game.js"></script>
