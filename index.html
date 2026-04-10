@@ -11,21 +11,35 @@
 
     <div id="setup-screen" class="overlay">
         <div class="logo-container">
-            <img src="logo-wawa.png" class="wawa-logo-img" alt="WAWA Logo">
-            <h1 class="wawa-tagline">Words Activity Double Fun!</h1>
+            <img src="logo-wawa.png" class="wawa-logo-img">
+            <h1 class="wawa-tagline ltr">Words Activity Double Fun!</h1>
         </div>
         
-        <div class="menu-container">
-            <button class="menu-btn" onclick="showRules()">איך משחקים?</button>
+        <div id="menu-main" class="menu-container">
+            <button class="menu-btn" onclick="showModal('rules')">איך משחקים?</button>
             <button class="menu-btn" onclick="setMode('cpu')">שחקן נגד מחשב</button>
             <button class="menu-btn" onclick="setMode('pvp')">שחקן נגד שחקן</button>
         </div>
 
-        <button class="lock-btn" onclick="openAdmin()">🔒</button>
+        <div id="names-input" class="menu-container" style="display:none;">
+            <input type="text" id="p1-name" placeholder="שם שחקן 1" class="name-input">
+            <input type="text" id="p2-name" placeholder="שם שחקן 2" class="name-input">
+            <button class="menu-btn" onclick="startPVP()">התחל משחק</button>
+        </div>
+
+        <button class="lock-btn" onclick="showModal('admin')">🔒</button>
+    </div>
+
+    <div id="info-modal" class="overlay" style="display:none;">
+        <div class="modal-content">
+            <h2 id="info-title"></h2>
+            <p id="info-text"></p>
+            <button class="modal-btn" onclick="closeModal()">הבנתי</button>
+        </div>
     </div>
 
     <div id="turn-modal" class="overlay" style="display:none;">
-        <div class="turn-box">
+        <div class="modal-content">
             <h1 id="next-player-name">תור של שחקן</h1>
             <p>העבר את המכשיר לשחקן הבא</p>
             <button class="ready-btn" onclick="revealHand()">אני מוכן!</button>
@@ -33,30 +47,18 @@
     </div>
 
     <div id="game-board" style="display:none;">
-        <div class="top-bar">
-            <span id="player-label">שחקן נוכחי</span>
-        </div>
+        <div id="opponent-hand" class="hand-container opponent-fan"></div>
 
         <div class="game-center">
-            <div id="discard-pile" class="pile-container"></div>
+            <div id="discard-pile" class="pile-slot"></div>
             <div class="deck-pile" onclick="drawCard()">
                 <img src="card_back.jpg" class="card-back-img">
             </div>
         </div>
 
-        <div class="player-hand-area">
-            <div id="player-hand" class="card-grid"></div>
-        </div>
-    </div>
-
-    <div id="question-overlay" class="overlay" style="display:none;">
-        <div class="question-card">
-            <div id="question-img-container"></div>
-            <div class="audio-row">
-                <button class="audio-btn" onclick="speakCurrentWord()">🔊</button>
-                <span id="target-word-en"></span>
-            </div>
-            <div id="answers-grid" class="answers-grid"></div>
+        <div class="player-area">
+            <div class="player-info"><span id="current-player-display"></span></div>
+            <div id="player-hand" class="hand-container player-fan"></div>
         </div>
     </div>
 
