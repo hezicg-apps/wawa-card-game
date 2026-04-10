@@ -6,30 +6,29 @@ let gameState = {
     discardPile: []
 };
 
-// קלפים לדוגמה (יש להחליף בנתיבים האמיתיים שלך)
-const deckSource = [
-    {word: 'Apple', color: 'green', src: 'cards/apple.png'},
-    {word: 'Dog', color: 'blue', src: 'cards/dog.png'},
-    {word: 'Sun', color: 'yellow', src: 'cards/sun.png'},
-    {word: 'Red', color: 'red', src: 'cards/red.png'}
+// קלפים - וודא שהנתיבים תואמים לקבצים שלך
+const cardData = [
+    {word: 'Snake', color: 'pink', src: 'cards/snake.png'},
+    {word: 'Red', color: 'red', src: 'cards/red.png'},
+    {word: 'Apple', color: 'green', src: 'cards/apple.png'}
 ];
 
-function showModal(type) {
+function openInfoModal(type) {
     const modal = document.getElementById('info-modal');
-    const title = document.getElementById('info-title');
-    const text = document.getElementById('info-text');
+    const title = document.getElementById('modal-title');
+    const text = document.getElementById('modal-text');
     
     if(type === 'rules') {
         title.innerText = "איך משחקים?";
-        text.innerText = "התאם צבע או מילה לקלף שעל השולחן. ענה נכון על השאלה כדי להניח את הקלף. הראשון שגומר את הקלפים מנצח!";
-    } else if (type === 'admin') {
-        title.innerText = "ניהול חפיסות";
-        text.innerText = "כאן תוכל להעלות קבצי ZIP בעתיד.";
+        text.innerText = "התאם צבע או מילה. ענה נכון כדי להניח קלף. הראשון שגומר את הקלפים מנצח!";
+    } else {
+        title.innerText = "ניהול";
+        text.innerText = "אזור ניהול חפיסות ZIP יהיה זמין בגרסאות הבאות.";
     }
     modal.style.display = 'flex';
 }
 
-function closeModal() { document.getElementById('info-modal').style.display = 'none'; }
+function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
 
 function setMode(mode) {
     gameState.mode = mode;
@@ -38,7 +37,7 @@ function setMode(mode) {
         document.getElementById('names-input').style.display = 'flex';
     } else {
         gameState.players = [
-            {name: 'אתה', hand: [], isCPU: false},
+            {name: 'שחקן', hand: [], isCPU: false},
             {name: 'מחשב', hand: [], isCPU: true}
         ];
         startGame();
@@ -56,9 +55,9 @@ function startPVP() {
 }
 
 function startGame() {
-    // יצירת חפיסה
+    // בניית חפיסה
     gameState.deck = [];
-    for(let i=0; i<10; i++) gameState.deck.push(...deckSource);
+    for(let i=0; i<15; i++) gameState.deck.push(...cardData);
     gameState.deck.sort(() => Math.random() - 0.5);
 
     // חלוקה
@@ -73,14 +72,12 @@ function startGame() {
 
 function startTurn() {
     const player = gameState.players[gameState.currentPlayer];
-    
-    // אם זה מחשב, או אם זה PvP אבל השחקן הראשון מתחיל - לא תמיד צריך מודאל
-    if (gameState.mode === 'cpu' && player.isCPU) {
-        renderBoard(true); // תצוגה מוסתרת
-        setTimeout(handleCPU, 1500);
-    } else if (gameState.mode === 'pvp') {
-        document.getElementById('next-player-name').innerText = player.name;
+    if (gameState.mode === 'pvp') {
+        document.getElementById('turn-instruction').innerText = `נא להעביר את המכשיר אל ${player.name}`;
         document.getElementById('turn-modal').style.display = 'flex';
+    } else if (player.isCPU) {
+        renderBoard(true);
+        setTimeout(handleCPU, 1500);
     } else {
         renderBoard();
     }
@@ -91,61 +88,58 @@ function revealHand() {
     renderBoard();
 }
 
-function renderBoard(isHideCurrent = false) {
+function renderBoard(hideCurrent = false) {
     const player = gameState.players[gameState.currentPlayer];
     const opponent = gameState.players[(gameState.currentPlayer + 1) % 2];
-    
-    document.getElementById('current-player-display').innerText = player.name;
 
-    // קלף שולחן
+    // קלף שולחן (מאונך)
     const topCard = gameState.discardPile[gameState.discardPile.length - 1];
     document.getElementById('discard-pile').innerHTML = `<img src="${topCard.src}" class="card-image">`;
 
-    // מניפת שחקן
-    const playerHandDiv = document.getElementById('player-hand');
-    playerHandDiv.innerHTML = '';
+    // יד שחקן (מניפה)
+    const pHand = document.getElementById('player-hand');
+    pHand.innerHTML = '';
     player.hand.forEach((card, i) => {
         const img = document.createElement('img');
-        img.src = isHideCurrent ? 'card_back.jpg' : card.src;
-        img.className = 'card-image';
-        
-        // חישוב מניפה
-        const angle = (i - (player.hand.length/2)) * 10;
-        const x = (i - (player.hand.length/2)) * 30;
+        img.src = hideCurrent ? 'card_back.jpg' : card.src;
+        img.className = 'card-image hand-card';
+        const angle = (i - (player.hand.length/2)) * 8;
+        const x = (i - (player.hand.length/2)) * 35;
         img.style.transform = `translateX(${x}px) rotate(${angle}deg)`;
-        img.style.zIndex = i;
-        
-        if(!isHideCurrent) img.onclick = () => playCard(card);
-        playerHandDiv.appendChild(img);
+        img.onclick = () => { if(!hideCurrent) playCard(card); };
+        pHand.appendChild(img);
     });
 
-    // מניפת יריב (תמיד גב הקלף)
-    const oppHandDiv = document.getElementById('opponent-hand');
-    oppHandDiv.innerHTML = '';
+    // יד יריב (גב קלף)
+    const oHand = document.getElementById('opponent-hand');
+    oHand.innerHTML = '';
     opponent.hand.forEach((_, i) => {
         const img = document.createElement('img');
         img.src = 'card_back.jpg';
-        img.className = 'card-back-img';
-        const angle = (i - (opponent.hand.length/2)) * 8;
+        img.className = 'card-back-img hand-card';
+        const angle = (i - (opponent.hand.length/2)) * 6;
         const x = (i - (opponent.hand.length/2)) * 25;
-        // במניפת יריב הופכים את הזווית
         img.style.transform = `translateX(${x}px) rotate(${180 - angle}deg)`;
-        oppHandDiv.appendChild(img);
+        oHand.appendChild(img);
     });
 }
 
 function playCard(card) {
-    // כאן תוסיף את מודאל השאלה. לצורך הבדיקה:
-    gameState.discardPile.push(card);
-    const p = gameState.players[gameState.currentPlayer];
-    p.hand = p.hand.filter(c => c !== card);
-    
-    if(p.hand.length === 0) {
-        alert(p.name + " ניצח!");
-        location.reload();
-        return;
+    const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+    if (card.color === topCard.color || card.word === topCard.word) {
+        gameState.discardPile.push(card);
+        const p = gameState.players[gameState.currentPlayer];
+        p.hand = p.hand.filter(c => c !== card);
+        if(p.hand.length === 0) return alert(p.name + " ניצח!");
+        nextTurn();
     }
-    nextTurn();
+}
+
+function drawCard() {
+    if(gameState.deck.length > 0) {
+        gameState.players[gameState.currentPlayer].hand.push(gameState.deck.pop());
+        nextTurn();
+    }
 }
 
 function nextTurn() {
@@ -153,12 +147,6 @@ function nextTurn() {
     startTurn();
 }
 
-function drawCard() {
-    gameState.players[gameState.currentPlayer].hand.push(gameState.deck.pop());
-    nextTurn();
-}
-
 function handleCPU() {
-    // לוגיקת מחשב פשוטה
     drawCard();
 }
