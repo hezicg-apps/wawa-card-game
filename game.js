@@ -1,52 +1,88 @@
-// הגדרות בסיס - שנה כאן את שמות הקבצים שיש לך בתיקייה
-const cardFiles = [
-    {src: 'cards/level-a/green_apple.png', word: 'Apple', color: 'green', heb: 'תפוח'},
-    {src: 'cards/level-a/blue_dog.png', word: 'Dog', color: 'blue', heb: 'כלב'},
-    {src: 'cards/level-a/red_sit.png', word: 'Sit', color: 'red', heb: 'לשבת'},
-    {src: 'cards/level-a/yellow_sun.png', word: 'Sun', color: 'yellow', heb: 'שמש'}
-];
-
 let gameState = {
+    mode: 'cpu',
     players: [],
     currentPlayer: 0,
-    discardPile: [],
     deck: [],
-    selectedCard: null
+    discardPile: []
 };
 
-function setMode(mode) {
-    if(mode === 'cpu') {
-        gameState.players = [{name: 'שחקן', hand: [], isCPU: false}, {name: 'מחשב', hand: [], isCPU: true}];
-    } else {
-        gameState.players = [{name: 'שחקן 1', hand: [], isCPU: false}, {name: 'שחקן 2', hand: [], isCPU: false}];
+// קלפים לדוגמה (יש להחליף בנתיבים האמיתיים שלך)
+const deckSource = [
+    {word: 'Apple', color: 'green', src: 'cards/apple.png'},
+    {word: 'Dog', color: 'blue', src: 'cards/dog.png'},
+    {word: 'Sun', color: 'yellow', src: 'cards/sun.png'},
+    {word: 'Red', color: 'red', src: 'cards/red.png'}
+];
+
+function showModal(type) {
+    const modal = document.getElementById('info-modal');
+    const title = document.getElementById('info-title');
+    const text = document.getElementById('info-text');
+    
+    if(type === 'rules') {
+        title.innerText = "איך משחקים?";
+        text.innerText = "התאם צבע או מילה לקלף שעל השולחן. ענה נכון על השאלה כדי להניח את הקלף. הראשון שגומר את הקלפים מנצח!";
+    } else if (type === 'admin') {
+        title.innerText = "ניהול חפיסות";
+        text.innerText = "כאן תוכל להעלות קבצי ZIP בעתיד.";
     }
-    initGame();
+    modal.style.display = 'flex';
 }
 
-function initGame() {
-    // יצירת חפיסה (לוגיקה פשוטה לצורך הבדיקה)
-    gameState.deck = [...cardFiles, ...cardFiles, ...cardFiles].sort(() => Math.random() - 0.5);
-    
-    // חלוקת 7 קלפים
-    gameState.players.forEach(p => {
-        p.hand = gameState.deck.splice(0, 7);
-    });
+function closeModal() { document.getElementById('info-modal').style.display = 'none'; }
 
-    gameState.discardPile = [gameState.deck.splice(0, 1)[0]];
-    
+function setMode(mode) {
+    gameState.mode = mode;
+    if(mode === 'pvp') {
+        document.getElementById('menu-main').style.display = 'none';
+        document.getElementById('names-input').style.display = 'flex';
+    } else {
+        gameState.players = [
+            {name: 'אתה', hand: [], isCPU: false},
+            {name: 'מחשב', hand: [], isCPU: true}
+        ];
+        startGame();
+    }
+}
+
+function startPVP() {
+    const p1 = document.getElementById('p1-name').value || "שחקן 1";
+    const p2 = document.getElementById('p2-name').value || "שחקן 2";
+    gameState.players = [
+        {name: p1, hand: [], isCPU: false},
+        {name: p2, hand: [], isCPU: false}
+    ];
+    startGame();
+}
+
+function startGame() {
+    // יצירת חפיסה
+    gameState.deck = [];
+    for(let i=0; i<10; i++) gameState.deck.push(...deckSource);
+    gameState.deck.sort(() => Math.random() - 0.5);
+
+    // חלוקה
+    gameState.players.forEach(p => p.hand = gameState.deck.splice(0, 7));
+    gameState.discardPile = [gameState.deck.pop()];
+
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('game-board').style.display = 'flex';
     
-    showTurnModal();
+    startTurn();
 }
 
-function showTurnModal() {
+function startTurn() {
     const player = gameState.players[gameState.currentPlayer];
-    if (player.isCPU) {
-        handleCPUTurn();
-    } else {
+    
+    // אם זה מחשב, או אם זה PvP אבל השחקן הראשון מתחיל - לא תמיד צריך מודאל
+    if (gameState.mode === 'cpu' && player.isCPU) {
+        renderBoard(true); // תצוגה מוסתרת
+        setTimeout(handleCPU, 1500);
+    } else if (gameState.mode === 'pvp') {
+        document.getElementById('next-player-name').innerText = player.name;
         document.getElementById('turn-modal').style.display = 'flex';
-        document.getElementById('next-player-name').innerText = `תור של: ${player.name}`;
+    } else {
+        renderBoard();
     }
 }
 
@@ -55,108 +91,74 @@ function revealHand() {
     renderBoard();
 }
 
-function renderBoard() {
+function renderBoard(isHideCurrent = false) {
     const player = gameState.players[gameState.currentPlayer];
-    document.getElementById('player-label').innerText = `תור: ${player.name}`;
+    const opponent = gameState.players[(gameState.currentPlayer + 1) % 2];
     
-    // קלף שולחן
-    const lastCard = gameState.discardPile[gameState.discardPile.length - 1];
-    document.getElementById('discard-pile').innerHTML = `<img src="${lastCard.src}" class="card-image">`;
+    document.getElementById('current-player-display').innerText = player.name;
 
-    // יד שחקן
-    const handDiv = document.getElementById('player-hand');
-    handDiv.innerHTML = '';
+    // קלף שולחן
+    const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+    document.getElementById('discard-pile').innerHTML = `<img src="${topCard.src}" class="card-image">`;
+
+    // מניפת שחקן
+    const playerHandDiv = document.getElementById('player-hand');
+    playerHandDiv.innerHTML = '';
     player.hand.forEach((card, i) => {
         const img = document.createElement('img');
-        img.src = card.src;
-        img.className = 'card-image hand-card';
-        // אפקט מניפה
-        const offset = (i - (player.hand.length / 2)) * 40;
-        const angle = (i - (player.hand.length / 2)) * 5;
-        img.style.transform = `translateX(${offset}px) rotate(${angle}deg)`;
-        img.onclick = () => openQuestion(card);
-        handDiv.appendChild(img);
-    });
-}
-
-function openQuestion(card) {
-    gameState.selectedCard = card;
-    document.getElementById('question-img-container').innerHTML = `<img src="${card.src}" style="width:120px">`;
-    document.getElementById('target-word-en').innerText = card.word.toUpperCase();
-    
-    const correct = card.heb;
-    let options = [correct, "בית", "חתול", "ספר"].sort(() => Math.random() - 0.5);
-    
-    const grid = document.getElementById('answers-grid');
-    grid.innerHTML = '';
-    options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'answer-btn';
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt, btn, correct);
-        grid.appendChild(btn);
-    });
-    
-    document.getElementById('question-overlay').style.display = 'flex';
-}
-
-function checkAnswer(selected, btn, correct) {
-    if (selected === correct) {
-        btn.style.background = "#2ecc71";
-        const tableCard = gameState.discardPile[gameState.discardPile.length - 1];
+        img.src = isHideCurrent ? 'card_back.jpg' : card.src;
+        img.className = 'card-image';
         
-        // בדיקת חוקיות טאקי (צבע או מילה)
-        if (gameState.selectedCard.color === tableCard.color || gameState.selectedCard.word === tableCard.word) {
-            setTimeout(completeMove, 600);
-        } else {
-            alert("תשובה נכונה! אבל הקלף לא מתאים לצבע או לאות שעל השולחן.");
-            setTimeout(nextTurn, 600);
-        }
-    } else {
-        btn.style.background = "#e74c3c";
-        alert(`טעות. התשובה הנכונה היא: ${correct}`);
-        setTimeout(nextTurn, 1000);
-    }
+        // חישוב מניפה
+        const angle = (i - (player.hand.length/2)) * 10;
+        const x = (i - (player.hand.length/2)) * 30;
+        img.style.transform = `translateX(${x}px) rotate(${angle}deg)`;
+        img.style.zIndex = i;
+        
+        if(!isHideCurrent) img.onclick = () => playCard(card);
+        playerHandDiv.appendChild(img);
+    });
+
+    // מניפת יריב (תמיד גב הקלף)
+    const oppHandDiv = document.getElementById('opponent-hand');
+    oppHandDiv.innerHTML = '';
+    opponent.hand.forEach((_, i) => {
+        const img = document.createElement('img');
+        img.src = 'card_back.jpg';
+        img.className = 'card-back-img';
+        const angle = (i - (opponent.hand.length/2)) * 8;
+        const x = (i - (opponent.hand.length/2)) * 25;
+        // במניפת יריב הופכים את הזווית
+        img.style.transform = `translateX(${x}px) rotate(${180 - angle}deg)`;
+        oppHandDiv.appendChild(img);
+    });
 }
 
-function completeMove() {
-    const player = gameState.players[gameState.currentPlayer];
-    gameState.discardPile.push(gameState.selectedCard);
-    player.hand = player.hand.filter(c => c !== gameState.selectedCard);
+function playCard(card) {
+    // כאן תוסיף את מודאל השאלה. לצורך הבדיקה:
+    gameState.discardPile.push(card);
+    const p = gameState.players[gameState.currentPlayer];
+    p.hand = p.hand.filter(c => c !== card);
     
-    document.getElementById('question-overlay').style.display = 'none';
-    if(player.hand.length === 0) return alert(player.name + " ניצח!");
+    if(p.hand.length === 0) {
+        alert(p.name + " ניצח!");
+        location.reload();
+        return;
+    }
     nextTurn();
 }
 
-function drawCard() {
-    if (gameState.deck.length > 0) {
-        const card = gameState.deck.pop();
-        gameState.players[gameState.currentPlayer].hand.push(card);
-        nextTurn();
-    }
-}
-
 function nextTurn() {
-    document.getElementById('question-overlay').style.display = 'none';
-    gameState.currentPlayer = (gameState.currentPlayer + 1) % gameState.players.length;
-    showTurnModal();
+    gameState.currentPlayer = (gameState.currentPlayer + 1) % 2;
+    startTurn();
 }
 
-function speakCurrentWord() {
-    const msg = new SpeechSynthesisUtterance(gameState.selectedCard.word);
-    msg.lang = 'en-US';
-    window.speechSynthesis.speak(msg);
+function drawCard() {
+    gameState.players[gameState.currentPlayer].hand.push(gameState.deck.pop());
+    nextTurn();
 }
 
-function handleCPUTurn() {
-    const cpu = gameState.players[gameState.currentPlayer];
-    // לוגיקה פשוטה למחשב
-    setTimeout(() => {
-        cpu.hand.pop(); // סתם זורק קלף לצורך הבדיקה
-        nextTurn();
-    }, 1500);
+function handleCPU() {
+    // לוגיקת מחשב פשוטה
+    drawCard();
 }
-
-function showRules() { alert("התאם צבע או מילה. ענה נכון על השאלה כדי להניח את הקלף."); }
-function openAdmin() { alert("כאן תוכל לטעון חפיסות ZIP בעתיד."); }
