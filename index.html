@@ -2,239 +2,75 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAWA Online | Words Activity Double Fun!</title>
+    <title>WAWA - Deck Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-blue: #092854; /* הכחול העמוק שלך */
-            --wawa-gold: #d4af37; /* צהוב זהב */
-            --pure-white: #ffffff;
-            --menu-black: #121212;
-        }
-
-        body {
-            background-color: var(--bg-blue);
-            color: var(--pure-white);
-            font-family: 'Comic Neue', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* מסך פתיחה */
-        #start-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            text-align: center;
-            animation: fadeIn 0.8s ease-in;
-        }
-
-        .logo-container {
-            margin-bottom: 30px;
-        }
-
-        .main-logo {
-            width: 320px; /* לוגו מוגדל */
-            max-width: 85vw;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-        }
-
-        /* תיקון סלוגן LTR וצביעת האותיות הראשונות בלבד */
-        .slogan {
-            direction: ltr;
-            display: inline-block;
-            font-size: 1.5rem;
-            color: var(--pure-white);
-            margin-top: 10px;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .first-letter-highlight {
-            color: var(--wawa-gold); /* רק האות הראשונה בזהב */
-            font-weight: bold;
-        }
-
-        /* כפתורי תפריט */
-        .menu-btn {
-            width: 320px;
-            max-width: 90vw;
-            padding: 16px;
-            margin: 8px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-radius: 60px;
-            border: 4px solid var(--menu-black);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Comic Neue', sans-serif;
-            box-sizing: border-box; /* חשוב למניעת החרבת העיצוב */
-        }
-
-        /* קו מתאר צהוב לכפתור ההוראות */
-        .btn-rules { 
-            background-color: var(--menu-black); 
-            color: var(--wawa-gold);
-            border: 4px solid var(--wawa-gold); 
-        }
-
-        .btn-online { background-color: var(--wawa-gold); color: var(--menu-black); }
-        .btn-ai { background-color: var(--pure-white); color: var(--menu-black); }
-
-        .menu-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
-        /* התאמה לניידים - מניעת שבירת טקסט */
-        @media (max-width: 480px) {
-            .menu-btn {
-                font-size: 1.2rem; /* טקסט קטן יותר בנייד */
-                padding: 14px;
-            }
-            .main-logo {
-                width: 260px;
-            }
-            .slogan {
-                font-size: 1.2rem;
-            }
-        }
-
-        /* מודאלים */
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 100;
-        }
-
-        .modal-content {
-            display: none;
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--pure-white);
-            color: var(--menu-black);
-            padding: 30px;
-            border-radius: 30px;
-            border: 6px solid var(--wawa-gold);
-            z-index: 110;
-            width: 550px;
-            max-width: 85%;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0,0,0,0.6);
-        }
-
-        .modal-content h2 { color: var(--bg-blue); font-size: 2rem; margin-top: 0; }
-        .modal-content p { font-size: 1.2rem; line-height: 1.6; text-align: right; margin-bottom: 20px; }
-
-        .action-btn {
-            background-color: var(--bg-blue);
-            color: var(--wawa-gold);
-            padding: 12px 45px;
-            font-size: 1.3rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Comic Neue', sans-serif;
-            font-weight: bold;
-        }
-
-        select {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            border-radius: 10px;
-            border: 2px solid var(--bg-blue);
-            margin: 15px 0;
-            width: 220px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        /* לוח משחק (נסתר בהתחלה) */
-        #game-container {
-            display: none;
-            width: 100%; height: 100%;
-            flex-direction: column;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
-    <div id="modal-overlay"></div>
+    <div id="setup-screen" class="overlay">
+        <div class="setup-box">
+            <img src="logo-wawa.png" class="main-logo">
+            
+            <div id="main-menu">
+                <button class="menu-btn" onclick="showSection('player-setup')">שחק עכשיו</button>
+                <button class="menu-btn" onclick="showSection('deck-manager')">ניהול חפיסות קלפים</button>
+            </div>
 
-    <div id="start-screen">
-        <div class="logo-container">
-            <img src="logo-wawa.png" alt="WAWA Logo" class="main-logo">
-            <br>
-            <div class="slogan">
-                <span class="first-letter-highlight">W</span>ords 
-                <span class="first-letter-highlight">A</span>ctivity 
-                Double Fun!
+            <div id="player-setup" style="display:none;">
+                <h3>הגדרת משחק</h3>
+                <button onclick="setMode('cpu')">נגד המחשב</button>
+                <button onclick="setMode('pvp')">שני שחקנים</button>
+                <div id="names-input" style="display:none; margin-top:10px;">
+                    <input type="text" id="p1-name" placeholder="שם שחקן 1">
+                    <input type="text" id="p2-name" placeholder="שם שחקן 2">
+                </div>
+                <button class="start-btn" onclick="initGame()">התחל משחק!</button>
+                <button class="back-btn" onclick="showSection('main-menu')">חזור</button>
+            </div>
+
+            <div id="deck-manager" style="display:none;">
+                <h3>טעינת חפיסת קלפים חדשה</h3>
+                <p>העלה קובץ ZIP המכיל תמונות וקובץ data.json</p>
+                <input type="file" id="zip-upload" accept=".zip">
+                <button onclick="processZip()">טען חפיסה</button>
+                <div id="deck-list"></div>
+                <button class="back-btn" onclick="showSection('main-menu')">חזור</button>
             </div>
         </div>
-        
-        <button class="menu-btn btn-rules" onclick="openModal('rules-modal')">איך משחקים?</button>
-        <button class="menu-btn btn-online" onclick="startGame('online')">שחקן נגד שחקן (Online)</button>
-        <button class="menu-btn btn-ai" onclick="openModal('ai-modal')">שחקן נגד מחשב</button>
     </div>
 
-    <div id="rules-modal" class="modal-content">
-        <h2>הוראות המשחק</h2>
-        <p>• כל שחקן מקבל 7 קלפים. המטרה: להיות הראשון בלי קלפים!</p>
-        <p>• ניתן להניח קלף שמתאים ב<b>צבע</b> או ב<b>אות הראשונה</b> לקלף שעל השולחן.</p>
-        <p>• קלפי הכוח המוזהבים (Mixer, Bridge ועוד) יעזרו לכם לשבש את היריבים.</p>
-        <button class="action-btn" onclick="closeModals()">הבנתי!</button>
-    </div>
-
-    <div id="ai-modal" class="modal-content">
-        <h2>משחק נגד המחשב</h2>
-        <p style="text-align: center;">כמה שחקני מחשב יצטרפו אליך?</p>
-        <select id="ai-player-count">
-            <option value="1">שחקן מחשב אחד</option>
-            <option value="2">2 שחקני מחשב</option>
-            <option value="3">3 שחקני מחשב</option>
-        </select>
-        <br>
-        <button class="action-btn" onclick="startGame('ai')">התחל משחק</button>
-    </div>
-
-    <div id="game-container">
+    <div id="game-board" style="display:none;">
+        <div id="turn-announcer" class="turn-overlay" style="display:none;">
+            <h1 id="next-player-name"></h1>
+            <button onclick="startTurn()">אני מוכן!</button>
         </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
+        <div class="center-area">
+            <div class="deck-pile" onclick="drawCard()">
+                <img src="cards/card_back.png" class="deck-img">
+            </div>
+            <div id="discard-pile"></div>
+        </div>
 
-        function openModal(id) {
-            document.getElementById('modal-overlay').style.display = 'block';
-            document.getElementById(id).style.display = 'block';
-        }
+        <div class="player-area">
+            <h2 id="current-display-name"></h2>
+            <div id="player-hand" class="card-grid"></div>
+        </div>
+    </div>
 
-        function closeModals() {
-            document.getElementById('modal-overlay').style.display = 'none';
-            document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
-        }
+    <div id="question-overlay" class="overlay" style="display:none;">
+        <div class="question-card">
+            <div id="question-img-container"></div>
+            <div class="audio-row">
+                <button class="audio-btn" onclick="speakWord()">🔊</button>
+                <span id="target-word-en"></span>
+            </div>
+            <div id="answers-grid" class="answers-grid"></div>
+        </div>
+    </div>
 
-        function startGame(mode) {
-            closeModals();
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-            
-            if (mode === 'ai') {
-                const count = document.getElementById('ai-player-count').value;
-                socket.emit('join-game', { mode: 'ai', count: count });
-            } else {
-                socket.emit('join-game', { mode: 'online' });
-            }
-        }
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
