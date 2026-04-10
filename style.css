@@ -1,72 +1,57 @@
 :root {
-    --bg-color: #072755;
+    --bg-blue: #072755;
+    --gold: #FFD700;
     --white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.1);
 }
 
-body {
-    background-color: var(--bg-color);
-    margin: 0;
+body, html {
+    margin: 0; padding: 0;
+    height: 100vh; width: 100vw;
+    background-color: var(--bg-blue);
     font-family: 'Comic Neue', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     overflow: hidden;
+    color: var(--white);
 }
 
 .overlay {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    position: fixed; inset: 0;
+    background-color: var(--bg-blue);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 1000;
 }
 
-/* עיצוב הלוגו והטקסט */
-.logo-area {
-    margin-bottom: 40px;
+/* לוגו ותגיות */
+.logo-container { text-align: center; margin-bottom: 30px; }
+.wawa-logo-img { width: 220px; height: auto; filter: drop-shadow(0 0 10px rgba(0,0,0,0.4)); }
+.wawa-tagline { color: var(--gold); font-size: 22px; margin-top: 10px; font-weight: bold; }
+
+/* כפתורים */
+.menu-container { display: flex; flex-direction: column; gap: 15px; width: 300px; }
+.menu-btn, .ready-btn {
+    background: var(--glass); border: 2px solid var(--white);
+    color: var(--white); padding: 15px; font-size: 18px;
+    border-radius: 50px; cursor: pointer; transition: 0.3s;
+}
+.menu-btn:hover, .ready-btn:hover { background: var(--white); color: var(--bg-blue); }
+
+.lock-btn { margin-top: 40px; background: none; border: none; font-size: 30px; cursor: pointer; }
+
+/* לוח המשחק */
+#game-board { display: flex; flex-direction: column; height: 100vh; padding: 20px; }
+.game-center { display: flex; justify-content: center; align-items: center; gap: 30px; flex-grow: 1; }
+.card-image, .card-back-img { width: 100px; height: 145px; border-radius: 10px; border: 2px solid white; background: white; }
+
+/* מניפה */
+.player-hand-area { height: 200px; display: flex; justify-content: center; position: relative; }
+.card-grid { display: flex; justify-content: center; width: 100%; }
+.hand-card {
+    position: absolute; bottom: 20px;
+    transition: transform 0.2s, bottom 0.2s;
 }
 
-.main-logo-img {
-    width: 280px; /* גדול ומרכזי */
-    height: auto;
-    filter: drop-shadow(0 0 15px rgba(0,0,0,0.3));
-}
-
-.logo-text {
-    color: #FFD700; /* צבע זהב/צהוב כמו בלוגו */
-    font-size: 24px;
-    margin-top: 10px;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-.menu-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 320px;
-}
-
-button {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid var(--white);
-    color: var(--white);
-    padding: 15px;
-    border-radius: 50px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-button:hover {
-    background: var(--white);
-    color: var(--bg-color);
-}
-
-.lock-btn {
-    background: none;
-    border: none;
-    font-size: 30px;
-    margin-top: 30px;
-    cursor: pointer;
-}
+/* שאלון */
+.question-card { background: white; color: var(--bg-blue); padding: 25px; border-radius: 20px; text-align: center; width: 320px; }
+.answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+.answer-btn { padding: 10px; border: 2px solid var(--bg-blue); border-radius: 10px; background: none; font-weight: bold; cursor: pointer; }
