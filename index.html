@@ -2,72 +2,45 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>WAWA - Deck Manager</title>
+    <title>WAWA - New Design</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
     <div id="setup-screen" class="overlay">
-        <div class="setup-box">
-            <img src="logo-wawa.png" class="main-logo">
-            
-            <div id="main-menu">
-                <button class="menu-btn" onclick="showSection('player-setup')">שחק עכשיו</button>
-                <button class="menu-btn" onclick="showSection('deck-manager')">ניהול חפיסות קלפים</button>
-            </div>
+        <img src="logo-wawa.png" class="main-logo">
+        
+        <div class="menu-container">
+            <button onclick="showRules()">איך משחקים?</button>
+            <button onclick="setMode('cpu')">שחקן נגד מחשב</button>
+            <button onclick="setMode('pvp')">שחקן נגד שחקן</button>
+        </div>
 
-            <div id="player-setup" style="display:none;">
-                <h3>הגדרת משחק</h3>
-                <button onclick="setMode('cpu')">נגד המחשב</button>
-                <button onclick="setMode('pvp')">שני שחקנים</button>
-                <div id="names-input" style="display:none; margin-top:10px;">
-                    <input type="text" id="p1-name" placeholder="שם שחקן 1">
-                    <input type="text" id="p2-name" placeholder="שם שחקן 2">
-                </div>
-                <button class="start-btn" onclick="initGame()">התחל משחק!</button>
-                <button class="back-btn" onclick="showSection('main-menu')">חזור</button>
-            </div>
+        <button class="lock-btn" onclick="openAdmin()">🔒</button>
+    </div>
 
-            <div id="deck-manager" style="display:none;">
-                <h3>טעינת חפיסת קלפים חדשה</h3>
-                <p>העלה קובץ ZIP המכיל תמונות וקובץ data.json</p>
-                <input type="file" id="zip-upload" accept=".zip">
-                <button onclick="processZip()">טען חפיסה</button>
-                <div id="deck-list"></div>
-                <button class="back-btn" onclick="showSection('main-menu')">חזור</button>
-            </div>
+    <div id="turn-modal" class="overlay" style="display:none; background: rgba(7,39,85,0.95);">
+        <div class="turn-box">
+            <h1 id="next-player-name" style="color:#072755">תור של חזי</h1>
+            <button onclick="revealHand()" style="background:#072755; color:white;">אני מוכן!</button>
         </div>
     </div>
 
     <div id="game-board" style="display:none;">
-        <div id="turn-announcer" class="turn-overlay" style="display:none;">
-            <h1 id="next-player-name"></h1>
-            <button onclick="startTurn()">אני מוכן!</button>
-        </div>
+        <div class="opponent-info" id="opp-info"></div>
 
         <div class="center-area">
             <div class="deck-pile" onclick="drawCard()">
-                <img src="cards/card_back.png" class="deck-img">
+                <img src="cards/card_back.png">
             </div>
-            <div id="discard-pile"></div>
+            <div id="discard-pile">
+                </div>
         </div>
 
-        <div class="player-area">
-            <h2 id="current-display-name"></h2>
+        <div class="player-hand-container">
+            <h3 id="current-player-name"></h3>
             <div id="player-hand" class="card-grid"></div>
-        </div>
-    </div>
-
-    <div id="question-overlay" class="overlay" style="display:none;">
-        <div class="question-card">
-            <div id="question-img-container"></div>
-            <div class="audio-row">
-                <button class="audio-btn" onclick="speakWord()">🔊</button>
-                <span id="target-word-en"></span>
-            </div>
-            <div id="answers-grid" class="answers-grid"></div>
         </div>
     </div>
 
