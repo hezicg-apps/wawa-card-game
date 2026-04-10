@@ -10,13 +10,13 @@
 <body>
 
     <div id="setup-screen" class="overlay">
-        <div class="logo-container">
-            <img src="logo-wawa.png" class="wawa-logo-img">
+        <div class="logo-area">
+            <img src="logo-wawa.png" class="wawa-logo-img" alt="WAWA Logo">
             <h1 class="wawa-tagline ltr">Words Activity Double Fun!</h1>
         </div>
         
         <div id="menu-main" class="menu-container">
-            <button class="menu-btn" onclick="showModal('rules')">איך משחקים?</button>
+            <button class="menu-btn" onclick="openInfoModal('rules')">איך משחקים?</button>
             <button class="menu-btn" onclick="setMode('cpu')">שחקן נגד מחשב</button>
             <button class="menu-btn" onclick="setMode('pvp')">שחקן נגד שחקן</button>
         </div>
@@ -27,21 +27,21 @@
             <button class="menu-btn" onclick="startPVP()">התחל משחק</button>
         </div>
 
-        <button class="lock-btn" onclick="showModal('admin')">🔒</button>
+        <button class="lock-btn" onclick="openInfoModal('admin')">🔒</button>
     </div>
 
     <div id="info-modal" class="overlay" style="display:none;">
         <div class="modal-content">
-            <h2 id="info-title"></h2>
-            <p id="info-text"></p>
-            <button class="modal-btn" onclick="closeModal()">הבנתי</button>
+            <h2 id="modal-title"></h2>
+            <p id="modal-text"></p>
+            <button class="modal-btn" onclick="closeInfoModal()">הבנתי</button>
         </div>
     </div>
 
     <div id="turn-modal" class="overlay" style="display:none;">
         <div class="modal-content">
-            <h1 id="next-player-name">תור של שחקן</h1>
-            <p>העבר את המכשיר לשחקן הבא</p>
+            <h1>תור השחקן</h1>
+            <p id="turn-instruction"></p>
             <button class="ready-btn" onclick="revealHand()">אני מוכן!</button>
         </div>
     </div>
@@ -50,14 +50,13 @@
         <div id="opponent-hand" class="hand-container opponent-fan"></div>
 
         <div class="game-center">
-            <div id="discard-pile" class="pile-slot"></div>
-            <div class="deck-pile" onclick="drawCard()">
-                <img src="card_back.jpg" class="card-back-img">
+            <div class="deck-pile horizontal" onclick="drawCard()">
+                <img src="card_back.jpg" class="card-back-img horizontal-card">
             </div>
+            <div id="discard-pile" class="pile-slot"></div>
         </div>
 
         <div class="player-area">
-            <div class="player-info"><span id="current-player-display"></span></div>
             <div id="player-hand" class="hand-container player-fan"></div>
         </div>
     </div>
